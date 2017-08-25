@@ -1,0 +1,45 @@
+apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "checkstyle"
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+version = theVersion
+description = "Generic Cassandra Sink it allows you to write events from Kafka to Cassandra"
+
+dependencies {
+    compile "org.apache.kafka:connect-api:$kafkaVersion"
+    compile "org.apache.kafka:connect-runtime:$kafkaVersion"
+    compile "org.slf4j:slf4j-api:$slf4jApi"
+
+    compile "com.datastax.cassandra:cassandra-driver-core:$cassandraDriver"
+
+    compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+}
+
+jar {
+    from sourceSets.main.java.srcDirs
+    from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+checkstyle {
+    configFile = file("checkstyle.xml")
+    configProperties = properties(file("checkstyle.properties"))
+}
+
+def properties(file) {
+    Properties props = new Properties()
+    props.load(new FileInputStream(file))
+    props
+}
