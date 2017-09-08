@@ -18,7 +18,7 @@ import io.smartcat.connect.cassandra.api.SinkRecordTransformer;
 import io.smartcat.connect.cassandra.api.StatementBuilder;
 
 /**
- * Cassadra Sink task.
+ * Cassandra Sink task.
  */
 public class CassandraSinkTask extends SinkTask {
 
