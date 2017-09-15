@@ -1,4 +1,5 @@
 apply plugin: "java"
+apply plugin: "maven-publish"
 apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "checkstyle"
@@ -10,7 +11,8 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = theVersion
+version = 1.0
+group = "io.smartcat"
 description = "Generic Cassandra Sink it allows you to write events from Kafka to Cassandra"
 
 dependencies {
@@ -32,6 +34,37 @@ jar {
         }
     }
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact tasks.packageSource
+            artifact tasks.packageJavadoc
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username project.hasProperty("bintrayUsername") ? bintrayUsername : System.getenv('BINTRAY_USER')
+                password project.hasProperty("bintrayPassword") ? bintrayPassword : System.getenv('BINTRAY_API_KEY')
+            }
+            url "https://api.bintray.com/maven/smartcat-labs/maven/kafka-cassandra-connector/;publish=1"
+        }
+    }
+}
+
+task packageSource(type: Jar) {
+    classifier "sources"
+    from sourceSets.main.allJava
+}
+
+task packageJavadoc(type: Jar) {
+    classifier = "javadoc"
+    from javadoc
+}
+
+build.dependsOn packageJavadoc
 
 checkstyle {
     configFile = file("checkstyle.xml")
